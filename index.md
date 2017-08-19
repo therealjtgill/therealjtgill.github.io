@@ -21,7 +21,7 @@ The NTM consists of four core components (see figure ...):
 * Write head
 * Memory matrix
 
-![Basic NTM Diagram](https://github.com/therealjtgill/therealjtgill.github.io/edit/master/assets/ntm_diagram_small.png)
+![Basic NTM Diagram](/assets/ntm_diagram_small.png)
 
 The controller's job is to learn how to produce activations that read from, and write to, the memory matrix according to the process specified by the training data. In essence, the controller attempts to learn a program that allows it to use the read and write heads as advantageously as possible.
 
