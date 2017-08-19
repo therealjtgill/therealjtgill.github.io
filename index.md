@@ -19,4 +19,4 @@ The NTM is modeled after the Turing Machine, and consists of four core component
 
 ![Basic NTM Diagram][ntm_basic_diagram]
 
-[ntm_basic_diagram]: https://github.com/therealjtgill/therealjtgill.github.io/tree/master/assets/ntm_diagram.png
+[ntm_basic_diagram]: https://therealjtgill.github.io/assets/ntm_diagram.png
