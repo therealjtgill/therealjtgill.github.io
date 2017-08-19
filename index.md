@@ -10,7 +10,7 @@ These are, without a doubt, my favorite advancement in neural network technology
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. In oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
-### General Workings
+### Architecture Overview
 
 NTM's fall under the category of recurrent neural networks (RNN's). Traditional RNN's store a *representation* of the data that's been seen at previous timesteps. The NTM has the potential to store *all* data that from previous timesteps and perform operations explicitly on that data. This makes the NTM well-suited for learning small programs
 
