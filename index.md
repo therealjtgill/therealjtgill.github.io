@@ -29,4 +29,5 @@ The controller's job is to learn how to produce activations that read from, and 
 
 The controller network can consist of any combination of feed-forward neural networks (FFNN's) and RNN's, but various experiments by the good people at Deep Mind have shown that an RNN controller produces the best results. The only restriction on the controller network is the number of outputs on the output layer; it produces the values that are used to read and write from the memory matrix.
 
-Both the read and write heads consist of a **soft attention** mechanism that allow them to focus on parts of the memory matrix. 
+Both the read and write heads consist of a **soft attention** mechanism that allow them to focus on parts of the memory matrix. What's cool is that the read/write heads can also choose to focus on *none* of the values in memory.
+In addition to an attention mechanism, the write head produces **erase** and **add** vectors which remove data from memory and add data to memory, respectively. This can be used to overwrite or modify an existing entry, or add information to an unused memory location.
