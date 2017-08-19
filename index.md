@@ -18,5 +18,5 @@ The NTM is modeled after the Turing Machine, and consists of four core component
 * Memory matrix
 
 ![Basic NTM Diagram](/assets/ntm_diagram.png =328x500)
-<img src="/assets/ntm_diagram.png" alt="Basic NTM Diagram" style="width: 328px;"/>
+<img src="/assets/ntm_diagram.png" alt="Basic NTM Diagram" style="width: 100px;"/>
 [ntm_basic_diagram]: /assets/ntm_diagram.png
