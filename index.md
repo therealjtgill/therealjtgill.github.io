@@ -18,8 +18,7 @@ The NTM consists of four core components (see figure below). They all inter-rely
 
 * Memory matrix
 * Controller network
-* Read head
-* Write head
+* Read/write heads
 
 ![Basic NTM Diagram](/assets/ntm_diagram_small.png)
 
@@ -31,7 +30,7 @@ The memory matrix literally just saves information that the controller tells it 
 
 The matrix is 15x8, meaning that there are 15 memory addresses (rows) that can have 8 "bits" of information stored in each address. I have to use "bits" in quotation marks because the values are in the range [0, 1]. Analog bits...?
 
-### Controller
+### Controller Network
 
 The controller's job is to learn how to produce activations that read from, and write to, the memory matrix according to the process specified by the training data. In essence, the controller attempts to learn a program that allows it to use the read and write heads as advantageously as possible.
 
@@ -39,7 +38,7 @@ The controller network can consist of any combination of feed-forward neural net
 
 ![Controller](/assets/controller_small.png)
 
-The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory. The nodes/neurons on the last controller layer are split into pieces, and a bunch of different activation functions are applied to those pieces (the different activation functions allow us to control the range of values we get).
+The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory. The nodes/neurons on the last controller layer are split into pieces, and several different activation functions are applied to those pieces (the different activation functions allow us to control the range of values we get from the controller).
 
 ### Read/Write Heads
 
