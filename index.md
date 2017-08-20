@@ -25,11 +25,11 @@ The NTM consists of four core components (see figure below). They all inter-rely
 
 ### Memory Matrix
 
-The memory matrix literally just saves information that the controller tells it to save. Data in the memory matrix is accessed by addressing a particular *row* of the matrix.
+The memory matrix literally just saves information that the controller tells it to save. Data in the memory matrix is accessed by addressing a particular *row* of the matrix. An example memory matrix is shown below.
 
 ![Example memory matrix](/assets/mem.png)
 
-The memory matrix is 15x8, meaning that there are 15 memory addresses (rows) that can have 8-bits of information stored in each address.
+The matrix is 15x8, meaning that there are 15 memory addresses (rows) that can have 8 "bits" of information stored in each address. I have to use "bits" in quotation marks because the values are in the range [0, 1]. Analog bits...?
 
 ### Controller
 
