@@ -39,7 +39,7 @@ The controller network can consist of any combination of feed-forward neural net
 
 ![Controller](/assets/controller_small.png)
 
-The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the $n^th$
+The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory.
 
 ### Read/Write Heads
 
