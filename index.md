@@ -39,14 +39,14 @@ The controller network can consist of any combination of feed-forward neural net
 
 ![Controller](/assets/controller_small.png)
 
-The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory.
+The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory. The nodes/neurons on the last controller layer are split into pieces, and a bunch of different activation functions are applied to those pieces (the different activation functions allow us to control the range of values we get).
 
 ### Read/Write Heads
 
 Both the read and write heads consist of a **soft attention** mechanism that allow them to focus on parts of the memory matrix. What's cool is that the read/write heads can also choose to focus on *none* of the values in memory. When you imagine a soft attention mechanism imagine a one-hot vector, or any vector with normalized elements (see below).
 
-![Attention mechanism example](/assets/attention.png)
+![Attention mechanism example](/assets/attention%2Bmemory.png)
 
-The row where the bright spot occurs corresponds to the row of the memory matrix that we're giving attention to.
+The row with the bright spot corresponds to the row of the memory matrix that we're giving attention to.
 
 In addition to an attention mechanism, the write head produces **erase** and **add** vectors which remove data from memory and add data to memory, respectively. This can be used to overwrite or modify an existing entry, or add information to an unused memory location.
