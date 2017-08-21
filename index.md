@@ -2,11 +2,11 @@
 
 These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the NTM and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
 
-1. Architecture overview
-2. The math driving the NTM
-3. Implementing a NTM in TensorFlow (using the RNNCell class)
-4. Tasks from the original paper
-5. MANN's and oneshot learning
+1. Architecture
+2. Math
+3. Implementation in TensorFlow (using the RNNCell class)
+4. Training tasks
+5. Oneshot learning
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. In oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
