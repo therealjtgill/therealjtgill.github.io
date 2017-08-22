@@ -21,7 +21,7 @@ This is an example of one of the things that the NTM can do: associative recall.
 
 An example of the input is shown below:
 
-![Associative recall input series](/assets/associatve_recall_input.png)
+![Associative recall input series](/assets/associative_recall_input.png)
 
 This task is extremely difficult, even for deep-LSTM networks. But it's a cinch for the NTM because the NTM has the ability to *perfectly* store and recall information that it's seen at all timesteps.
 
