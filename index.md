@@ -2,16 +2,16 @@
 
 These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the NTM and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
 
-0. What can it do?
-1. Architecture
-2. Math
-3. Implementation in TensorFlow
-4. Training tasks
-5. Oneshot learning
+1. What can it do?
+2. Architecture
+3. Math
+4. Implementation in TensorFlow
+5. Training tasks
+6. Oneshot learning
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. Oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
-## 0. What Can It Do?
+## 1. What Can It Do?
 
 This is an example of one of the things that the NTM can do: associative recall. The task proceeds as follows:
 
@@ -25,9 +25,9 @@ An example of the input is shown below:
 
 This task is extremely difficult, even for deep-LSTM networks. But it's a cinch for the NTM because the NTM has the ability to *perfectly* store and recall information that it's seen at all timesteps.
 
-## 1. Architecture
+## 2. Architecture
 
-NTM's fall under the category of recurrent neural networks (RNN's). Traditional RNN's store a *representation* of the data that's been seen at previous timesteps. The NTM has the potential to store *all* data that from previous timesteps and perform operations explicitly on that data. This makes the NTM well-suited for learning small programs. The NTM works well with time-series data, and in most applications the NTM is presented with *sequences* of information, and then asked to perform some sort of operation (or operations) on that data, and that operation usually ends up being time-dependent.
+NTM's technically fall under the category of recurrent neural networks (RNN's). Traditional RNN's store a *representation* of the data that's been seen at previous timesteps. The NTM has the potential to store *all* data that from previous timesteps and perform operations explicitly on that data. This makes the NTM well-suited for learning small programs. The NTM works well with time-series data, and in most applications the NTM is presented with *sequences* of information, and then asked to perform some sort of operation (or operations) on that data, and that operation usually ends up being time-dependent.
 
 The NTM consists of four core components (see figure below). They all inter-rely on each other heavily, so it's hard to talk about one component without talking about the others... but this organization seems to make sense:
 
@@ -69,7 +69,7 @@ In addition to an attention mechanism, the write head produces **erase** and **a
 
 The read and write heads can produce attention at different places in memory, which allows the NTM to write-to memory and read-from memory separately. In this implementation we force the NTM to write first and read second.
 
-## 2. Math
+## 3. Math
 
 All right, so where do the attention mechanisms come from? We said before that the read/write heads produce addresses can focus on different locations, but the math to create those addresses is exactly the same for both heads. The read/write heads produce a **k**<sub>t</sub>, **s**<sub>t</sub>, β<sub>t</sub>, g<sub>t</sub>, and γ<sub>t</sub> (see below). Note that emboldened variables represent vectors, capitalized variables are matrices, and lower-case, non-bolded variables are scalars.
 
