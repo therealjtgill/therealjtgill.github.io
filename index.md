@@ -8,7 +8,7 @@ These are, without a doubt, my favorite advancement in neural network technology
 4. Training tasks
 5. Oneshot learning
 
-The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. In oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
+The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. Oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
 ## Architecture Overview
 
