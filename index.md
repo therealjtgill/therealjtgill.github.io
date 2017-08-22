@@ -2,6 +2,7 @@
 
 These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the NTM and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
 
+0. What can it do?
 1. Architecture
 2. Math
 3. Implementation in TensorFlow
@@ -9,6 +10,20 @@ These are, without a doubt, my favorite advancement in neural network technology
 5. Oneshot learning
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. Oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
+
+## 0. What Can It Do?
+
+This is an example of one of the things that the NTM can do: associative recall. The task proceeds as follows:
+
+* The NTM is presented with a series of random patterns [**p**<sub>1</sub>, **p**<sub>2</sub>, ..., **p**<sub>n</sub>] with delimiters between each pattern
+* The NTM is then presented with a pattern that was seen in the series of patterns, **p**<sub>i</sub>, followed by a special 'stop' delimiter
+* The NTM is supposed to spit out the pattern that was seen immediately before this pattern, **p**<sub>i-1</sub>
+
+An example of the input is shown below:
+
+![Associative recall input series](/assets/associatve_recall_input.png)
+
+This task is extremely difficult, even for deep-LSTM networks. But it's a cinch for the NTM because the NTM has the ability to *perfectly* store and recall information that it's seen at all timesteps.
 
 ## 1. Architecture
 
