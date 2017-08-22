@@ -10,7 +10,7 @@ These are, without a doubt, my favorite advancement in neural network technology
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. Oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
-## Architecture Overview
+## Architecture
 
 NTM's fall under the category of recurrent neural networks (RNN's). Traditional RNN's store a *representation* of the data that's been seen at previous timesteps. The NTM has the potential to store *all* data that from previous timesteps and perform operations explicitly on that data. This makes the NTM well-suited for learning small programs.
 
@@ -38,7 +38,7 @@ The controller network can consist of any combination of feed-forward neural net
 
 ![Controller](/assets/controller_small.png)
 
-The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory. The nodes/neurons on the last controller layer are split into pieces, and several different activation functions are applied to those pieces (the different activation functions allow us to control the range of values we get from the controller).
+The boxes in green show the layers of the controller. The arrows entering/exiting the controller layers on the left/right sides show that the layers can possibly be RNN's. The vector values emitted from the last layer of the controller network are used to write-to and read-from memory. **Most importantly**, the nodes/neurons on the last controller layer are split into pieces, and several different activation functions are applied to those pieces. The different activation functions allow us to control the range of values we get from the controller, and ultimately let us perform the **reading and writing operations**.
 
 ### Read/Write Heads
 
@@ -53,3 +53,10 @@ In addition to an attention mechanism, the write head produces **erase** and **a
 ![Writing to memory example](/assets/write_memory_small.png)
 
 The read and write heads can produce attention at different places in memory, which allows the NTM to write-to memory and read-from memory separately. In this implementation we force the NTM to write first and read second.
+
+## Math
+
+All right, so where do the attention mechanisms come from? We said before that the read/write heads produce addresses can focus on different locations, but the math to create those addresses is exactly the same for both heads. The read/write heads produce a **k**<sub>t</sub>, **s**<sub>t</sub>, β<sub>t</sub>, g<sub>t</sub>, and γ<sub>t</sub> (see below).
+
+![Last layer of controller](/assets/controller_output_small.png)
+
