@@ -51,3 +51,5 @@ The row with the bright spot corresponds to the row of the memory matrix that we
 In addition to an attention mechanism, the write head produces **erase** and **add** vectors which remove data from memory and add data to memory, respectively. This can be used to overwrite or modify an existing entry, or add information to an unused memory location. An example of this is shown below (white pixels have values close to 1, black pixels close to 0).
 
 ![Writing to memory example](/assets/write_memory_small.png)
+
+The read and write heads can produce attention at different places in memory, which allows the NTM to write-to memory and read-from memory separately. In this implementation we force the NTM to write first and read second.
