@@ -4,7 +4,7 @@ These are, without a doubt, my favorite advancement in neural network technology
 
 1. Architecture
 2. Math
-3. Implementation in TensorFlow (using the RNNCell class)
+3. Implementation in TensorFlow
 4. Training tasks
 5. Oneshot learning
 
@@ -16,15 +16,15 @@ NTM's fall under the category of recurrent neural networks (RNN's). Traditional 
 
 The NTM consists of four core components (see figure below). They all inter-rely on each other heavily, so it's hard to talk about one component without talking about the others... but this organization seems to make sense:
 
-* Memory matrix
+* External memory matrix
 * Controller network
 * Read/write heads
 
 ![Basic NTM Diagram](/assets/ntm_diagram_small.png)
 
-### Memory Matrix
+### External memory Matrix
 
-The memory matrix literally just saves information that the controller tells it to save. Data in the memory matrix is accessed by addressing a particular *row* of the matrix. An example memory matrix is shown below.
+The memory matrix is literally just a repository of information that the controller saves. Data in the memory matrix is accessed (for reading or writing) by addressing a particular *row* of the matrix. The matrix is called 'external' because it isn't trained through error backpropagation. An example memory matrix is shown below.
 
 ![Example memory matrix](/assets/mem.png)
 
@@ -32,7 +32,7 @@ The matrix is 15x8, meaning that there are 15 memory addresses (rows) that can h
 
 ### Controller Network
 
-The controller's job is to learn how to produce activations that read from, and write to, the memory matrix according to the process specified by the training data. In essence, the controller attempts to learn a program that allows it to use the read and write heads as advantageously as possible.
+The controller's job is to learn how to produce activations that read-from and write-to the memory matrix according to the process specified by the training data. In essence, the controller attempts to learn a program that allows it to use the read and write heads as advantageously as possible.
 
 The controller network can consist of any combination of feed-forward neural networks (FFNN's) and RNN's, but various experiments by the good people at Deep Mind have shown that an RNN controller produces the best results. The only restriction on the controller network is the number of outputs on the output layer; it produces the values that are used to read and write from the memory matrix.
 
@@ -48,4 +48,6 @@ Both the read and write heads consist of a **soft attention** mechanism that all
 
 The row with the bright spot corresponds to the row of the memory matrix that we're giving attention to.
 
-In addition to an attention mechanism, the write head produces **erase** and **add** vectors which remove data from memory and add data to memory, respectively. This can be used to overwrite or modify an existing entry, or add information to an unused memory location.
+In addition to an attention mechanism, the write head produces **erase** and **add** vectors which remove data from memory and add data to memory, respectively. This can be used to overwrite or modify an existing entry, or add information to an unused memory location. An example of this is shown below (white pixels have values close to 1, black pixels close to 0).
+
+![Writing to memory example](/assets/write_memory_small.png)
