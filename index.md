@@ -23,7 +23,8 @@ An example of the input is shown below:
 
 ![Associative recall input series](/assets/associative_recall_input.png)
 
-This task is extremely difficult, even for deep-LSTM networks. But it's a cinch for the NTM because the NTM has the ability to *perfectly* store and recall information that it's seen at all timesteps.
+This task is extremely difficult for RNN's, even for deep-LSTM networks, and in most cases they incur greater error as the number of patterns increases. But it's a cinch for the NTM because it has the ability to *perfectly* store and recall information that it's seen at all timesteps (though the size of the memory matrix is a limiting factor).
+The NTM can also produce a general solution when an arbitrary number of patterns are used, even if it was never explicitly *trained* to work with a given number of patterns. Other RNN architectures cannot generalize past what was seen in training.
 
 ## 2. Architecture
 
@@ -92,3 +93,10 @@ The first five variables are used to build addresses to access data from memory,
 3. shifting the address to a new location using circular convolution
 4. sharpening the result of the shifting operation.
 
+In keeping with the original paper, we'll call the final address **w**<sub>t</sub>, and all intermediate steps will be some superscripted version of **w**<sub>t</sub>. We'll use parentheses notation to indicate that we're accessing a particular element of a vector, e.g. *w(i)*<sub>t</sub>, and we assume that vectors are 0-indexed.
+
+### Content-Based Addressing
+
+The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and attenuation factor, β<sub>t</sub>. The key emitted by the controller network bears some degree of similarity to an element already in memory. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the attenuation factor, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
+
+![Content-based addressing](/assets/content_based_addressing_small.PNG)
