@@ -72,7 +72,7 @@ The read and write heads can produce attention at different places in memory, wh
 
 ## 3. Math
 
-All right, so where do the attention mechanisms come from? We said before that the read/write heads produce addresses can focus on different locations, but the math to create those addresses is exactly the same for both heads. The read/write heads produce a **k**<sub>t</sub>, **s**<sub>t</sub>, β<sub>t</sub>, g<sub>t</sub>, and γ<sub>t</sub> (see below). Note that emboldened variables represent vectors, capitalized variables are matrices, and lower-case, non-bolded variables are scalars.
+All right, so where do the attention mechanisms come from? We said before that the read/write heads produce addresses to focus on different locations, but the math to create those addresses is exactly the same for both heads. The read/write heads produce a **k**<sub>t</sub>, **s**<sub>t</sub>, β<sub>t</sub>, g<sub>t</sub>, and γ<sub>t</sub> (see below). Note that emboldened variables represent vectors, capitalized variables are matrices, and lower-case, non-bolded variables are scalars.
 
 ![Last layer of controller](/assets/controller_out_small.png)
 
@@ -97,7 +97,7 @@ In keeping with the original paper, we'll call the final address **w**<sub>t</su
 
 ### Content-Based Addressing
 
-The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and key strength, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the key strength, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
+The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and key strength, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using **cosine similarity** (the function *K(.)* shown below), and the result of this comparison is a vector. The similarity vector is multiplied by the key strength, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
 
 ![Content-based addressing](/assets/content_based_addressing_small.PNG)
 
