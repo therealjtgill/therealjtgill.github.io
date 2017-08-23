@@ -103,7 +103,7 @@ The goal of content-based addressing is to allow the NTM to create addresses bas
 
 ![Cosine similarity](/assets/cosine_similarity.PNG)
 
-So what's the importance of all of these things?
+So what's the importance of these things?
 
 The key emitted by the controller network bears some degree of similarity to an element already in memory, meaning that the NTM can *potentially* group items in memory based on their similarity to each other. Note that the key could also be completely *dissimilar* to every memory element.
 The attenuation factor serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
