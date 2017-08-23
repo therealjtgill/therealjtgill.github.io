@@ -1,6 +1,6 @@
 # **Neural Turing Machines**
 
-These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the NTM and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
+These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the Neural Turing Machine (NTM) and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
 
 1. What can it do?
 2. Architecture
@@ -17,13 +17,13 @@ This is an example of one of the things that the NTM can do: associative recall.
 
 * The NTM is presented with a series of random patterns [**p**<sub>1</sub>, **p**<sub>2</sub>, ..., **p**<sub>n</sub>] with delimiters between each pattern
 * The NTM is then presented with a pattern that was seen in the series of patterns, **p**<sub>i</sub>, followed by a special 'stop' delimiter
-* The NTM is supposed to spit out the pattern that was seen immediately before this pattern, **p**<sub>i-1</sub>
+* The NTM is supposed to spit out the pattern that was seen immediately before this pattern, **p**<sub>i-1</sub> (unless **p**<sub>i</sub> = **p**<sub>n</sub>, in which case the NTM would recall **p**<sub>1</sub>)
 
 An example of the input is shown below:
 
 ![Associative recall input series](/assets/associative_recall_input.png)
 
-This task is extremely difficult for RNN's, even for deep-LSTM networks, and in most cases they incur greater error as the number of patterns increases. But it's a cinch for the NTM because it has the ability to *perfectly* store and recall information that it's seen at all timesteps (though the size of the memory matrix is a limiting factor).
+This task is extremely difficult for RNN's, even for deep Long Short-Term Memory (LSTM) networks, and in most cases they incur greater error as the number of patterns increases. But it's a cinch for the NTM because it has the ability to *perfectly* store and recall information that it's seen at all timesteps (though the size of the memory matrix is a limiting factor).
 The NTM can also produce a general solution when an arbitrary number of patterns are used, even if it was never explicitly *trained* to work with a given number of patterns. Other RNN architectures cannot generalize past what was seen in training.
 
 ## 2. Architecture
@@ -50,7 +50,7 @@ The matrix is 15x8, meaning that there are 15 memory addresses (rows) that can h
 
 The controller's job is to learn how to produce activations that read-from and write-to the memory matrix according to the process specified by the training data. In essence, the controller attempts to learn a program that allows it to use the read and write heads as advantageously as possible.
 
-The controller network can consist of any combination of feed-forward neural networks (FFNN's) and RNN's, but various experiments by the good people at Deep Mind have shown that an RNN controller produces the best results. The only restriction on the controller network is the number of outputs on the output layer; for every timestep in the task, the controller produces values that are used to read and write from the memory matrix.
+The controller network can consist of any combination of feedforward networks and RNN's, but various experiments by the good people at Deep Mind have shown that an RNN controller produces the best results. The only restriction on the controller network is the number of outputs on the output layer; for every timestep in the task, the controller produces values that are used to read and write from the memory matrix.
 
 ![Controller](/assets/controller_small.png)
 
@@ -79,7 +79,7 @@ All right, so where do the attention mechanisms come from? We said before that t
 | Piece | Name        | Description                                                                           | Activation             |
 |-------|-------------|---------------------------------------------------------------------------------------|------------------------|
 | **k**<sub>t</sub> | Key         | Emitted for content-based addressing.                                                 | None                   |
-| β<sub>t</sub>     | Attenuation | Sharpens address generated from content-based addressing.                             | Softplus               |
+| β<sub>t</sub>     | Key strength | Sharpens address generated from content-based addressing.                             | Softplus               |
 | g<sub>t</sub>     | Gate        | Interpolates between content-based address and address used at the previous timestep. | Sigmoid                |
 | **s**<sub>t</sub> | Shift       | Shifts the current address to a potentially different location.                       | Softmax                |
 | γ<sub>t</sub>     | Sharpen     | Sharpens the result of the shift operation.                                           | Oneplus (softplus + 1) |
@@ -97,7 +97,7 @@ In keeping with the original paper, we'll call the final address **w**<sub>t</su
 
 ### Content-Based Addressing
 
-The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and attenuation factor, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the attenuation factor, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
+The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and key strength, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the key strength, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
 
 ![Content-based addressing](/assets/content_based_addressing_small.PNG)
 
@@ -106,7 +106,7 @@ The goal of content-based addressing is to allow the NTM to create addresses bas
 So what's the importance of these things?
 
 The key emitted by the controller network bears some degree of similarity to an element already in memory, meaning that the NTM can *potentially* group items in memory based on their similarity to each other. Note that the key could also be completely *dissimilar* to every memory element.
-The attenuation factor serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
+The key strength serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
 
 The cosine similarity calculation is probably something you've seen before. A small numerical value δ = 10<sup>-8</sup> is added to the denominator to prevent loathsome *0/0* errors.
 Note: the address isn't strictly a probability distribution, we don't sample from the attention vector to obtain an address, but it *is* normalized such that all of the elements sum to *1*.
