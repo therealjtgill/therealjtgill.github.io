@@ -97,6 +97,16 @@ In keeping with the original paper, we'll call the final address **w**<sub>t</su
 
 ### Content-Based Addressing
 
-The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and attenuation factor, β<sub>t</sub>. The key emitted by the controller network bears some degree of similarity to an element already in memory. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the attenuation factor, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
+The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and attenuation factor, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using cosine similarity, and the result of this comparison is a vector. The similarity vector is multiplied by the attenuation factor, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
 
 ![Content-based addressing](/assets/content_based_addressing_small.PNG)
+
+![Cosine similarity](/assets/cosine_similarity.PNG)
+
+So what's the importance of all of these things?
+
+The key emitted by the controller network bears some degree of similarity to an element already in memory, meaning that the NTM can *potentially* group items in memory based on their similarity to each other. Note that the key could also be completely *dissimilar* to every memory element.
+The attenuation factor serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
+
+The cosine similarity calculation is probably something you've seen before. A small numerical value δ = 10<sup>-8</sup> is added to the denominator to prevent loathsome *0/0* errors.
+Note: the address isn't strictly a probability distribution, we don't sample from the attention vector to obtain an address, but it *is* normalized such that all of the elements sum to *1*.
