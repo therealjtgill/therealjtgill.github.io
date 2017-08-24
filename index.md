@@ -131,7 +131,7 @@ First, we choose an index of **s**<sub>t</sub> that corresponds to no movement, 
 
 ![Center index definition](/assets/center_index.PNG)
 
-So an **s**<sub>t</sub> with 5 elements would have element 2 at the center, etc. But just because we *say* that the elements to the right and left of the center *should* move the address, it doesn't mean that they actually *will*. In order for this to work, the center index has to actually be at index *0*, and the index that decrements the address should be at index *N-1*. But if we only have *S < N* elements in **s**<sub>t</sub>, how can we possibly have any values at index *N-1*? **Zero padding.**
+So an **s**<sub>t</sub> with 5 elements would have index 2 at the center, etc. But just because we *say* that the elements to the right and left of the center *should* move the address, it doesn't mean that they actually *will*. In order for this to work, the center index has to actually be at index *0*, and the index that decrements the address should be at index *N-1*. But if we only have *S < N* elements in **s**<sub>t</sub>, how can we possibly have any values at index *N-1*? **Zero padding.**
 
 The next thing that we do is pad **s**<sub>t</sub> with exactly *N-S* zeros in such a way that index *c* is relocated to index zero. We do that by performing the following operation:
 
