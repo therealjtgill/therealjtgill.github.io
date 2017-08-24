@@ -97,7 +97,7 @@ In keeping with the original paper, we'll call the final address **w**<sub>t</su
 
 ### Content-Based Addressing
 
-The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and key strength, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using **cosine similarity** (the function *K(.)* shown below), and the result of this comparison is a vector. The similarity vector is multiplied by the key strength, β<sub>t</sub>, [0, ∞), and the scaled similarity vector is passed through a softmax operation.
+The goal of content-based addressing is to allow the NTM to create addresses based on items already in memory. Here we use the key, **k**<sub>t</sub>, and key strength, β<sub>t</sub>. The key is compared to each row of the memory matrix, *M<sub>t</sub>(i)* using **cosine similarity** (the function *K(.)* shown below), and the result of this comparison is a vector. The similarity vector is multiplied by the key strength, β<sub>t</sub> ∈ [0, ∞), and the scaled similarity vector is passed through a softmax operation.
 
 ![Content-based addressing](/assets/content_based_addressing_small.PNG)
 
@@ -105,8 +105,28 @@ The goal of content-based addressing is to allow the NTM to create addresses bas
 
 So what's the importance of these things?
 
-The key emitted by the controller network bears some degree of similarity to an element already in memory, meaning that the NTM can *potentially* group items in memory based on their similarity to each other. Note that the key could also be completely *dissimilar* to every memory element.
-The key strength serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
+The **key** emitted by the controller network bears some degree of similarity to an element already in memory, meaning that the NTM can *potentially* group items in memory based on their similarity to each other. Note that the key could also be completely *dissimilar* to every memory element.
+The **key strength** serves two purposes: for *β<sub>t</sub> >> 1*, the generated address becomes heavily sharpened around a single value; for *β<sub>t</sub> < 1*, the generated address becomes blurry, meaning that no particular content address is being focused on. When *β<sub>t</sub> = 0* the content address becomes a uniform distribution over all possible memory addresses.
 
 The cosine similarity calculation is probably something you've seen before. A small numerical value δ = 10<sup>-8</sup> is added to the denominator to prevent loathsome *0/0* errors.
 Note: the address isn't strictly a probability distribution, we don't sample from the attention vector to obtain an address, but it *is* normalized such that all of the elements sum to *1*.
+
+### Interpolation
+
+At this point, the NTM uses g<sub>t</sub> ∈ [0, 1] to choose whether the content-based address or the address from the previous timestep, **w**<sub>t-1</sub>, has more effect on the final address, **w**<sub>t</sub>.
+
+![Interpolation](/assets/interpolation.PNG)
+
+At this point the interpolated address **w**<sup>g</sub><sub>t</sub> is still normalized, so we *could* just allow this to be the final address value. But this would be bad news if we wanted the NTM to be able to linearly scan through all of its memory addresses, so the NTM has two more steps that allow it to shift the interpolated address to a new location.
+
+### Shifting
+
+The NTM can take the interpolated address and shift its focus to a new address. It does this through **circular convolution** (you DSP folks will probably have seen this before). This step required the most troubleshooting in code, so I'm going to spend a bit of time on it, and I'm going to jump straight into the tricks that I used.
+
+The shift vector, **s**<sub>t</sub> has *S* elements where 2 ≤ *S* ≤ *N* (where *N* = the number of memory addresses). The vector is normalized, so all of the elements sum to *1*. We get the address to shift by assigning mass to different indices of **s**<sub>t</sub>. We also want our shift vector to be able to move the address forward *or* backward *or* not move the address at all.
+
+First, we choose an index of **s**<sub>t</sub> that corresponds to no movement, which we'll call the **center index**. Then all indices to the left of the center index will move the address backward (decrement), and all indicies to the right will move the address forward (increment). The center index *c* is defined as the floor of *S/2* (see below).
+
+![Center index definition](/assets/center_index.PNG)
+
+So an **s**<sub>t</sub> with five elements would have element \#2 at the center, etc.
