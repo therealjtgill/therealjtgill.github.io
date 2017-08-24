@@ -2,7 +2,7 @@
 
 These are, without a doubt, my favorite advancement in neural network technology. The goal of this blog is to elucidate the machinations of the Neural Turing Machine (NTM) and use a TensorFlow implementation to demonstrate some of the tasks that they've been trained to perform. Here's the stuff I'm going to talk about:
 
-1. What it can do
+1. What they can do
 2. Architecture
 3. Math
 4. Implementation in TensorFlow
@@ -11,7 +11,7 @@ These are, without a doubt, my favorite advancement in neural network technology
 
 The NTM is demonstrably well-suited to performing memory-related tasks, such as: storing and recalling a sequence of bits, associative recall, and, to some extent, sorting data based on priority values (section 4). Additionally, further work has shown that vanilla NTM's are quite capable of oneshot learning. Oneshot learning, also known as meta-learning, is a method of teaching neural networks *how to learn* (section 5).
 
-## 1. What It Can Do
+## 1. What They Can Do
 
 This is an example of one of the things that the NTM can do: associative recall. The task proceeds as follows:
 
