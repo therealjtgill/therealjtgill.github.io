@@ -121,7 +121,9 @@ At this point the interpolated address **w**<sup>g</sup><sub>t</sub> is still no
 
 ### Shifting
 
-The NTM can take the interpolated address and shift its focus to a new address. It does this through **circular convolution** (you DSP folks will probably have seen this before). This step required the most troubleshooting in code, so I'm going to spend a bit of time on it, and I'm going to jump straight into the tricks that I used.
+The NTM can take the interpolated address and shift its focus to a new address. It does this through **circular convolution** (you DSP folks will probably have seen this before). This step required the most troubleshooting in code, so I'm going to spend a bit of time on it, and I'm going to jump straight into the tricks that I used. The circular convolution equation is shown below.
+
+![Circular convolution](/assets/circular_convolution.PNG)
 
 The shift vector, **s**<sub>t</sub> has *S* elements where 2 ≤ *S* ≤ *N* (where *N* = the number of memory addresses). The vector is normalized, so all of the elements sum to *1*. We get the address to shift by assigning mass to different indices of **s**<sub>t</sub>. We also want our shift vector to be able to move the address forward *or* backward *or* not move the address at all.
 
@@ -129,4 +131,12 @@ First, we choose an index of **s**<sub>t</sub> that corresponds to no movement, 
 
 ![Center index definition](/assets/center_index.PNG)
 
-So an **s**<sub>t</sub> with five elements would have element \#2 at the center, etc.
+So an **s**<sub>t</sub> with 5 elements would have element 2 at the center, etc. But just because we *say* that the elements to the right and left of the center *should* move the address, it doesn't mean that they actually *will*. In order for this to work, the center index has to actually be at index *0*, and the index that decrements the address should be at index *N-1*. But if we only have *S < N* elements in **s**<sub>t</sub>, how can we possibly have any values at index *N-1*? **Zero padding.**
+
+The next thing that we do is pad **s**<sub>t</sub> with exactly *N-S* zeros in such a way that index *c* is relocated to index zero. We do that by performing the following operation:
+
+![Fancy-pants zero padding](/assets/zero_padding.PNG)
+
+Ultimately we end up with a new shift vector, **s**<sup>p</sup><sub>t</sub>, with exactly *N* elements, which we use to perform the circular convolution.
+
+![Actual shift operation](/assets/shift_op.PNG)
