@@ -117,7 +117,7 @@ At this point, the NTM uses g<sub>t</sub> ∈ [0, 1] to choose whether the conte
 
 ![Interpolation](/assets/interpolation.PNG)
 
-At this point the interpolated address **w**<sup>g</sub><sub>t</sub> is still normalized, so we *could* just allow this to be the final address value. But this would be bad news if we wanted the NTM to be able to linearly scan through all of its memory addresses, so the NTM has two more steps that allow it to shift the interpolated address to a new location.
+At this point the interpolated address **w**<sup>g</sup><sub>t</sub> is still normalized, so we *could* just allow this to be the final address value. But this would be bad news if we wanted the NTM to be able to linearly scan through all of its memory addresses, so the NTM has two more steps that allow it to shift the interpolated address to a new location.
 
 ### Shifting
 
