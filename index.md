@@ -131,7 +131,7 @@ First, we choose an index of **s**<sub>t</sub> that corresponds to no movement, 
 
 ![Center index definition](/assets/center_index.PNG)
 
-So an **s**<sub>t</sub> with 5 elements would have index 2 at the center, etc. But just because we *say* that the elements to the right and left of the center *should* move the address, it doesn't mean that they actually *will*. In order for this to work, the center index has to actually be at index *0*, and the index that decrements the address should be at index *N-1*. But if we only have *S < N* elements in **s**<sub>t</sub>, how can we possibly have any values at index *N-1*? **Zero padding.**
+So an **s**<sub>t</sub> with 5 elements would have index 2 at the center, etc. But just because we *say* that the elements to the right and left of the center *should* move the address, it doesn't mean that they actually *will*. In order for this to work, the center index has to actually be at index *0*, and the index that decrements the address by *1* should be at index *N-1*. But if we only have *S < N* elements in **s**<sub>t</sub>, how can we possibly have any values at index *N-1*? **Zero padding.**
 
 The next thing that we do is pad **s**<sub>t</sub> with exactly *N-S* zeros in such a way that index *c* is relocated to index zero. We do that by performing the following operation:
 
@@ -140,3 +140,13 @@ The next thing that we do is pad **s**<sub>t</sub> with exactly *N-S* zeros in s
 Ultimately we end up with a new shift vector, **s**<sup>p</sup><sub>t</sub>, with exactly *N* elements, which we use to perform the circular convolution.
 
 ![Actual shift operation](/assets/shift_op.PNG)
+
+The nice thing about zero-padding is that it keeps the vector normalized.
+
+### Sharpening
+
+Convolution tends to "blur" things, so we offset this by exponentiating every term in the shifted vector and re-normalizing. Note that the exponentiation term is emitted by the controller, so the controller determines how much sharpening occurs.
+
+![Sharpening operation](/assets/sharpening.PNG)
+
+Note that γ<sub>t</sub> is a scalar and is bounded as [1, ∞), so the worst that the controller could do is leave behind a blurry address. It's interesting that the folks at DeepMind disallowed γ<sub>t</sub> from being 0, which would allow the NTM to select all addresses with equal weighting (essentially performing a **no-op**).
