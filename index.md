@@ -150,3 +150,19 @@ Convolution tends to "blur" things, so we offset this by exponentiating every te
 ![Sharpening operation](/assets/sharpening.PNG)
 
 Note that γ<sub>t</sub> is a scalar and is bounded as [1, ∞), so the worst that the controller could do is leave behind a blurry address. It's interesting that the folks at DeepMind disallowed γ<sub>t</sub> from being 0, which would allow the NTM to select all addresses with equal weighting (essentially performing a **no-op**).
+
+## 4. Implementation in TensorFlow
+
+Disclaimer: this implementation was created as part of a class project in the last year of my M.S. using TensorFlow v1.0.
+
+The NTM is an RNN, and as such, we need to train it like an RNN. Luckily the TensorFlow (TF) API has an [abstract class](https://www.tensorflow.org/api_docs/python/tf/contrib/rnn/RNNCell "RNNCell class") that allows us to define our own NTM class that can run and be trained just like any other RNN in the TF library.
+A slight downside to this is that we have to redefine the math in the previous section to work for *matrices* of input rather than vectors. Since the NTM operates on time-series data, training occurs over minibatches that are defined as rank-3 tensors. These tensors have a shape of [batch_size, time, vector_length], where
+
+* **batch_size** is the number of training sequences being passed to the network
+* **time** is the total number of timesteps, or the length of the training sequences
+* **vector_length** is the size of an individual vector being passed to the network as input
+
+As an example, let's imagine that we're training a language model with a 5000 word vocabulary with individual words represented as a one-hot encoding. At training time we want to give the network 64 sequences with 100 words per sequence (a sequence of words from a book or newspaper). This means that we'd pass the network a training tensor of size [64, 100, 5000].
+
+I'm not going to get into the details of backpropagation through time, but there are a few things that need to be taken into consideration before we start coding. The NTM will receive slices of the training minibatch at each timestep. So for the first timestep, the NTM will receive a matrix of size (using our example above) [64, 5000] corresponding to the elements at [:, 0, :] from the original minibatch. At the next timstep, the NTM will receive another slice of the same size as the previous, this time corresponding to [:, 1, :]. As this happens, TF works its magic, computes gradients, and updates the weights of our network.
+
