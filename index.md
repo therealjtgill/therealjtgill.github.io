@@ -253,7 +253,6 @@ def __call__(self, inputs, state, scope=None):
 
   with vs.variable_scope(scope or 'ntm_cell'):
     mem_prev = array_ops.stack(state[0:-2], axis=1)
-
     w_read_prev = state[-2]
     w_write_prev = state[-1]
 
@@ -266,14 +265,12 @@ def __call__(self, inputs, state, scope=None):
 
     erase = array_ops.expand_dims(write_pieces[-1], axis=2)
     add = array_ops.expand_dims(write_pieces[-2], axis=2)
-
     w_write_ = array_ops.expand_dims(w_write, axis=2)
 
     erase_box = math_ops.matmul(
         w_write_, array_ops.transpose(erase, perm=[0, 2, 1]))
     add_box = math_ops.matmul(
         w_write_, array_ops.transpose(add, perm=[0, 2, 1]))
-
     mem_new = mem_prev*(1. - erase_box) + add_box
 
     read_w_ = array_ops.expand_dims(w_read, axis=1)
@@ -284,3 +281,5 @@ def __call__(self, inputs, state, scope=None):
 
 return reads, state_tuple
 ```
+
+Most of the math is squirreled away behind functions, and that's totally by design (the fact that these functions aren't class methods is also by design).
