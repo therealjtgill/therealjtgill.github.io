@@ -70,6 +70,8 @@ In addition to an attention mechanism, the write head produces **erase** and **a
 
 The read and write heads can produce attention at different places in memory, which allows the NTM to write-to memory and read-from memory separately. In this implementation we force the NTM to write first and read second.
 
+As an aside, the NTM *can* use multiple read/write heads, but we're going to limit outselves to just one read/write head.
+
 ## 3. Math
 
 All right, so where do the attention mechanisms come from? We said before that the read/write heads produce addresses to focus on different locations, but the math to create those addresses is exactly the same for both heads. The read/write heads produce a **k**<sub>t</sub>, **s**<sub>t</sub>, β<sub>t</sub>, g<sub>t</sub>, and γ<sub>t</sub> (see below). Note that emboldened variables represent vectors, capitalized variables are matrices, and lower-case, non-bolded variables are scalars.
@@ -156,13 +158,67 @@ Note that γ<sub>t</sub> is a scalar and is bounded as [1, ∞), so the worst th
 Disclaimer: this implementation was created as part of a class project in the last year of my M.S. using TensorFlow v1.0.
 
 The NTM is an RNN, and as such, we need to train it like an RNN. Luckily the TensorFlow (TF) API has an [abstract class](https://www.tensorflow.org/api_docs/python/tf/contrib/rnn/RNNCell "RNNCell class") that allows us to define our own NTM class that can run and be trained just like any other RNN in the TF library.
-A slight downside to this is that we have to redefine the math in the previous section to work for *matrices* of input rather than vectors. Since the NTM operates on time-series data, training occurs over minibatches that are defined as rank-3 tensors. These tensors have a shape of [batch_size, time, vector_length], where
+A slight downside to this is that we have to redefine the math in the previous section to work for *matrices* of input rather than vectors. Since the NTM operates on time-series data, training occurs over minibatches that are defined as rank-3 tensors. These tensors have a shape of [batch_size, sequence_length, vector_size], where
 
 * **batch_size** is the number of training sequences being passed to the network
-* **time** is the total number of timesteps, or the length of the training sequences
-* **vector_length** is the size of an individual vector being passed to the network as input
+* **sequence_length** is the total number of timesteps, or the length of the training sequences
+* **vector_size** is the size of an individual vector being passed to the network as input
 
 As an example, let's imagine that we're training a language model with a 5000 word vocabulary with individual words represented as a one-hot encoding. At training time we want to give the network 64 sequences with 100 words per sequence (a sequence of words from a book or newspaper). This means that we'd pass the network a training tensor of size [64, 100, 5000].
 
-I'm not going to get into the details of backpropagation through time, but there are a few things that need to be taken into consideration before we start coding. The NTM will receive slices of the training minibatch at each timestep. So for the first timestep, the NTM will receive a matrix of size (using our example above) [64, 5000] corresponding to the elements at [:, 0, :] from the original minibatch. At the next timstep, the NTM will receive another slice of the same size as the previous, this time corresponding to [:, 1, :]. As this happens, TF works its magic, computes gradients, and updates the weights of our network.
+I'm not going to get into the details of backpropagation through time, but there are a few things that need to be taken into consideration before we start coding. The NTM will receive slices of the training minibatch at each timestep. So for the first timestep, the NTM will receive a matrix of size (using our example above) [64, 5000] corresponding to the elements at [:, 0, :] from the original minibatch. At the next timstep, the NTM will receive another slice of the same size as the previous, this time corresponding to [:, 1, :]. As this happens, TF works its magic by computing gradients and updating our network's weights.
+
+### Sizes of Relevant Vectors/Matrices
+
+I'm adding this as a reference because we'll need it when we implement the RNNCell class.
+
+| Item              | Size (number of elements) |
+|-------------------|---------------------------|
+| *M*<sub>t</sub>   | N x M                     |
+| **k**<sub>t</sub> | M                         |
+| β<sub>t</sub>     | 1                         |
+| g<sub>t</sub>     | 1                         |
+| **s**<sub>t</sub> | S                         |
+| γ<sub>t</sub>     | 1                         |
+| **e**<sub>t</sub> | M                         |
+| **a**<sub>t</sub> | M                         |
+
+Note that all of these items only depend on three integers: *N* (the number of memory addresses), *M* (the representation of a particular element in memory), and *S* (the number of allowable address shifts made available to the controller).
+
+### The RNNCell Class
+
+Let me elucidate exactly what our RNNCell class will be doing; our NTMCell will take the output of the controller (the various pieces from the very first table in the blog), use it to create read/write addresses, and perform read/write operations on the memory matrix. 
+What's interesting about this class is that it contains **no trainable variables**; all of the trainable variables will be contained solely in the controller network.
+
+Ok, so there are a few methods that we're required to implement, namely: `__init__`, `state_size`, `output_size`, and `__call__`. Let's start with the `__init__` method and work our way through the rest.
+
+If you look at the definitions of other classes that inherit from RNNCell, you'll see that they use the initializer to internalize some information about the cell being implemented (the number of units being used, types of activation functions, etc.). We already know what activation functions we'll be using, all that we have to provide are values for *N*, *M*, and *S*.
+
+```python
+def __init__(self, mem_size, shift_range=3):
+  self.N, self.M = mem_size
+  self.S = shift_range
+```
+
+We give the ```shift_range``` a default value of ```3``` because this what was used in the paper for all of the experiments. For the sake of clarify, having a shift range of three allows us to shift the address forward (increment its position), backward (decrement its position), or leave the address in the same location.
+
+Pretty painless so far, now let's implement the ```state_size``` method.
+
+The RNNCell's **state size** is the size of recurrent state that's modified from timestep to timestep. Our hidden state will consist of the **read and write addresses** from the previous time step, as well as the **memory matrix** from the previous timestep. Our recurrent state will be a tuple containing ```(memory_row_1, memory_row_2, ..., memory_row_N, read_address, write_address)```. From the [documentation](https://github.com/tensorflow/tensorflow/blob/bf6df5e2330dff8383869999840578fa5128e794/tensorflow/python/ops/rnn_cell_impl.py#L194) we know that the state size can be a tuple of integers. Our ```state_size``` method looks like this:
+
+```python
+def state_size(self):
+  return self.N*(self.M,)  + (self.N, self.N)
+```
+
+So our recurrent state will be a tuple that contains each row of the memory matrix (in order), with the previous read and write addresses at the end of the tuple.
+
+Still relatively painless, now on to ```output_size```.
+
+Our **output_size** is the size of the vector that's regurgitated from the NTMCell. We're going to use the output of the read head as the output of our NTMCell, which means that the NTMCell will have an output size of *M* (because the value that we *read* from memory will have **eight** elements in it). We don't need to use a tuple here because we're returning a single value.
+
+```python
+def output_size(self):
+  return self.M
+```
 
