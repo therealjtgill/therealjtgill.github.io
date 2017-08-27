@@ -190,8 +190,26 @@ Note that all of these items only depend on three integers: *N* (the number of m
 Let me elucidate exactly what our RNNCell class will be doing; our NTMCell will take the output of the controller (the various pieces from the very first table in the blog), use it to create read/write addresses, and perform read/write operations on the memory matrix. 
 What's interesting about this class is that it contains **no trainable variables**; all of the trainable variables will be contained solely in the controller network.
 
-Ok, so there are a few methods that we're required to implement, namely: `__init__`, `state_size`, `output_size`, and `__call__`. Let's start with the `__init__` method and work our way through the rest.
+Ok, so there are a few methods that we're required to implement, namely: `__init__`, `state_size`, `output_size`, and `__call__`. Let's start with the `__init__` method and work our way through the rest. Below is what we start out with:
 
+```python
+from tensorflow.python.ops.rnn_cell_impl import _RNNCell as RNNCell
+# The newest version of TF allows you to directly import 'RNNCell'
+
+class NTMCell(RNNCell):
+  def __init__(self):
+    pass
+    
+  def __call__(self, inputs, state):
+    return output, updated_state
+    
+  def state_size(self):
+    pass
+    
+  def output_size(self):
+    pass
+```
+   
 If you look at the definitions of other classes that inherit from RNNCell, you'll see that they use the initializer to internalize some information about the cell being implemented (the number of units being used, types of activation functions, etc.). We already know what activation functions we'll be using, all that we have to provide are values for *N*, *M*, and *S*.
 
 ```python
@@ -222,3 +240,47 @@ def output_size(self):
   return self.M
 ```
 
+The ```__call__``` method is where all of the magic will happen. It takes in a **batch** of inputs and current states, and returns a batch of outputs and new states. The fact that it returns batches rather than vectors is important to us because it increases the rank of the tensors we return by one (note that a vector is a rank-1 tensor, matrix is a rank-2 tensor).
+The interesting result of this is that our memory matrix, once assembled, will be a rank-3 tensor of size ```(batch_size, N, M)```.
+Below is the code that's used in the ```__call__``` method to generate read/write addresses, read and write from memory, and update the recurrent state of the NTMCell.
+
+```python
+def __call__(self, inputs, state, scope=None):
+
+  M = self.M
+  N = self.N
+  S = self.shift_range
+
+  with vs.variable_scope(scope or 'ntm_cell'):
+    mem_prev = array_ops.stack(state[0:-2], axis=1)
+
+    w_read_prev = state[-2]
+    w_write_prev = state[-1]
+
+    write_pieces, read_pieces = self.head_pieces(inputs, (N, M), S)
+
+    w_write = generate_address(write_pieces[0:5], w_write_prev,
+        mem_prev, N, S)
+    w_read = generate_address(read_pieces, w_read_prev,
+        mem_prev, N, S)
+
+    erase = array_ops.expand_dims(write_pieces[-1], axis=2)
+    add = array_ops.expand_dims(write_pieces[-2], axis=2)
+
+    w_write_ = array_ops.expand_dims(w_write, axis=2)
+
+    erase_box = math_ops.matmul(
+        w_write_, array_ops.transpose(erase, perm=[0, 2, 1]))
+    add_box = math_ops.matmul(
+        w_write_, array_ops.transpose(add, perm=[0, 2, 1]))
+
+    mem_new = mem_prev*(1. - erase_box) + add_box
+
+    read_w_ = array_ops.expand_dims(w_read, axis=1)
+
+    reads = array_ops.squeeze(math_ops.matmul(read_w_, mem_new))
+    state_tuple = tuple(array_ops.unstack(mem_new, axis=1)) + \
+        (w_read, w_write)
+
+return reads, state_tuple
+```
